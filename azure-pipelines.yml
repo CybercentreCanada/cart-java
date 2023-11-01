@@ -1,0 +1,65 @@
+trigger:
+  batch: true
+  branches:
+    include:
+    - develop
+    - main
+
+pr:
+  branches:
+    include:
+    - develop
+    - main
+
+variables:
+  tag: '$(Build.BuildId)'
+
+pool: 'Scalable Build Pool'
+
+stages:
+- stage: Build
+  jobs:
+  - job: Build
+    timeoutInMinutes: 90
+    workspace:
+      clean: all
+    variables:
+      MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+      MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+
+    steps:
+    - task: Cache@2
+      inputs:
+        key: 'maven | "$(Agent.OS)" | pom.xml'
+        restoreKeys: |
+          maven | "$(Agent.OS)"
+          maven
+        path: $(MAVEN_CACHE_FOLDER)
+      displayName: Cache Maven local repo
+
+    - bash: |
+        echo $(CCCS_GPG_SECRET_KEY) | base64 -d  | gpg --import --batch --pinentry-mode loopback
+      displayName: "Import GPG Secret Key"
+      name: import
+      env:
+        CCCS_GPG_SECRET_KEY: $(cccs_gpg_secret_key)
+
+    - task: Maven@3
+      displayName: "Build project with maven"
+      env:
+        CCCS_GPG_KEY: $(cccs_gpg_key)
+        DEPLOY_TOKEN: $(deploy_token)
+      inputs:
+        mavenVersionOption: 'Path'
+        mavenDirectory: '/opt/maven3/'
+        mavenSetM2Home: true
+        mavenAuthenticateFeed: true
+        skipEffectivePom: true
+        mavenPomFile: 'pom.xml'
+        mavenOptions: '$(MAVEN_OPTS)'
+        javaHomeOption: 'Path'
+        jdkDirectory: '/opt/java11'
+        publishJUnitResults: true
+        testResultsFiles: "**/surefire-reports/TEST-*.xml"
+        goals: "deploy"
+        options: "-s deploy-settings.xml -DDEPLOY_TOKEN=$(DEPLOY_TOKEN) -Dgpg.skip=false -Dgpg.passphrase=$(CCCS_GPG_KEY)"
