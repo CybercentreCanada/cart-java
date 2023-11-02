@@ -12,7 +12,12 @@
     <name>CART Utilities</name>
     <description>CART file format Utilities.</description>
     <url>https://github.com/CybercentreCanada/cart-java</url>
-
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
     <scm>
         <connection>git@github.com:CybercentreCanada/cart-java.git</connection>
         <developerConnection>scm:git:ssh://github.com:CybercentreCanada/cart-java.git</developerConnection>
@@ -22,7 +27,14 @@
         <name>Canadian Centre for Cyber Security</name>
         <url>https://www.cyber.gc.ca/</url>
     </organization>
-
+    <developers>
+        <developer>
+            <name>Analysis Support</name>
+            <email>analysis-development@cyber.gc.ca</email>
+            <organization>Canadian Centre for Cyber Security</organization>
+            <organizationUrl>https://www.cyber.gc.ca/</organizationUrl>
+        </developer>
+    </developers>
     <properties>
         <gpg.skip>true</gpg.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -78,7 +90,7 @@
                 <configuration>
                     <serverId>ossrh</serverId>
                     <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
-                    <autoReleaseAfterClose>false</autoReleaseAfterClose>
+                    <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
             <plugin>
