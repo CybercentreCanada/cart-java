@@ -36,6 +36,7 @@
         </developer>
     </developers>
     <properties>
+        <build.output>target</build.output>
         <gpg.skip>true</gpg.skip>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
@@ -81,6 +82,7 @@
     </dependencies>
 
     <build>
+        <directory>${build.output}</directory>
         <plugins>
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
@@ -160,4 +162,17 @@
             </plugin>
         </plugins>
     </build>
+    
+    <!-- To solve our collision with vscode when building -->
+    <!-- https://github.com/redhat-developer/vscode-java/issues/1381#issuecomment-846578339 -->
+    <profiles>
+        <profile>
+            <activation>
+            <property><name>m2e.version</name></property>
+            </activation>
+            <properties>
+            <build.output>target-ide</build.output>
+            </properties>
+        </profile>
+    </profiles>
 </project>
