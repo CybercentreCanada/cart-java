@@ -1,21 +1,19 @@
 package ca.gc.cyber.inerting.cart;
 
-import com.google.common.io.LittleEndianDataOutputStream;
-import com.google.common.primitives.Bytes;
-import com.google.common.primitives.Longs;
-import com.google.gson.JsonElement;
-import org.apache.commons.codec.binary.Hex;
-import org.junit.Test;
-
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
-import java.io.ByteArrayOutputStream;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
-@SuppressWarnings("MissingJavadoc")
+import com.google.common.io.LittleEndianDataOutputStream;
+import com.google.common.primitives.Bytes;
+import com.google.common.primitives.Longs;
+import com.google.gson.JsonElement;
+import java.io.ByteArrayOutputStream;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.codec.binary.Hex;
+import org.junit.Test;
+
 public class FooterTest {
 
     @Test

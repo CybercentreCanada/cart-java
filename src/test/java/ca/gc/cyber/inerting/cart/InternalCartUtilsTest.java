@@ -1,22 +1,20 @@
 package ca.gc.cyber.inerting.cart;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.commons.io.IOUtils;
-import org.junit.Test;
-
-import javax.crypto.spec.SecretKeySpec;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
+import javax.crypto.spec.SecretKeySpec;
+import org.apache.commons.io.IOUtils;
+import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThrows;
-
-@SuppressWarnings("MissingJavadoc")
 public class InternalCartUtilsTest {
 
     @Test
