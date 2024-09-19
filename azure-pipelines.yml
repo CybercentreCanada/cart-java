@@ -46,7 +46,7 @@ stages:
             env:
               CCCS_GPG_SECRET_KEY: $(cccs_gpg_secret_key)
 
-          - task: Maven@3
+          - task: Maven@4
             displayName: "Build project with maven"
             env:
               CCCS_GPG_KEY: $(cccs_gpg_key)
