@@ -14,7 +14,14 @@ pr:
       - main
 
 variables:
-  tag: "$(Build.BuildId)"
+  - name: tag
+    value: "$(Build.BuildId)"
+  - name: mvn_goal
+    # TODO NW-3748 Include develop here, to deploy snapshot builds?
+    ${{ if eq(variables['Build.SourceBranchName'], 'main' ) }}:
+      value: 'clean deploy'
+    ${{ else }}:
+      value: 'clean verify'
 
 pool: PB Scalable Build Pool
 
@@ -22,6 +29,7 @@ stages:
   - stage: Build
     jobs:
       - job: Build
+        # TODO NW-3748 90 minutes is a LONG timeout.
         timeoutInMinutes: 90
         workspace:
           clean: all
@@ -63,5 +71,6 @@ stages:
               jdkDirectory: "/opt/java11"
               publishJUnitResults: true
               testResultsFiles: "**/surefire-reports/TEST-*.xml"
-              goals: "deploy"
+              goals: "$(mvn_goal)"
+              # TODO NW-3748 We don't really need/want these options for non-deploy builds, but it might be easier to just set them all the time.
               options: "-s deploy-settings.xml -DDEPLOY_TOKEN=$(DEPLOY_TOKEN) -Dgpg.skip=false -Dgpg.passphrase=$(CCCS_GPG_KEY)"
