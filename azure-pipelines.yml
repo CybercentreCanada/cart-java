@@ -1,65 +1,76 @@
+name: Cart Java $(Build.DefinitionName)_$(SourceBranchName)$(Rev:.r)
+
 trigger:
   batch: true
   branches:
     include:
-    - develop
-    - main
+      - develop
+      - main
 
 pr:
   branches:
     include:
-    - develop
-    - main
+      - develop
+      - main
 
 variables:
-  tag: '$(Build.BuildId)'
+  - name: tag
+    value: "$(Build.BuildId)"
+  - name: mvn_goal
+    ${{ if eq(variables['Build.SourceBranchName'], 'main' ) }}:
+      value: 'clean deploy'
+    ${{ else }}:
+      value: 'clean verify'
 
-pool: 'Scalable Build Pool'
+pool: PB Scalable Build Pool
 
 stages:
-- stage: Build
-  jobs:
-  - job: Build
-    timeoutInMinutes: 90
-    workspace:
-      clean: all
-    variables:
-      MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
-      MAVEN_OPTS: '-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)'
+  - stage: Build
+    jobs:
+      - job: Build
+        timeoutInMinutes: 10
+        workspace:
+          clean: all
+        variables:
+          MAVEN_CACHE_FOLDER: $(Pipeline.Workspace)/.m2/repository
+          MAVEN_OPTS: "-Dmaven.repo.local=$(MAVEN_CACHE_FOLDER)"
 
-    steps:
-    - task: Cache@2
-      inputs:
-        key: 'maven | "$(Agent.OS)" | pom.xml'
-        restoreKeys: |
-          maven | "$(Agent.OS)"
-          maven
-        path: $(MAVEN_CACHE_FOLDER)
-      displayName: Cache Maven local repo
+        steps:
+          - task: Cache@2
+            inputs:
+              key: 'maven | "$(Agent.OS)" | pom.xml'
+              restoreKeys: |
+                maven | "$(Agent.OS)"
+                maven
+              path: $(MAVEN_CACHE_FOLDER)
+            displayName: Cache Maven local repo
 
-    - bash: |
-        echo $(CCCS_GPG_SECRET_KEY) | base64 -d  | gpg --import --batch --pinentry-mode loopback
-      displayName: "Import GPG Secret Key"
-      name: import
-      env:
-        CCCS_GPG_SECRET_KEY: $(cccs_gpg_secret_key)
+          - bash: |
+              echo "$(CCCS_GPG_SECRET_KEY)" | base64 -d  | gpg --import --batch --pinentry-mode loopback
+            displayName: "Import GPG Secret Key"
+            name: import
+            env:
+              # The cccs_gpg_secret_key secret is set in the settings UI for this pipeline.
+              CCCS_GPG_SECRET_KEY: $(cccs_gpg_secret_key)
 
-    - task: Maven@3
-      displayName: "Build project with maven"
-      env:
-        CCCS_GPG_KEY: $(cccs_gpg_key)
-        DEPLOY_TOKEN: $(deploy_token)
-      inputs:
-        mavenVersionOption: 'Path'
-        mavenDirectory: '/opt/maven3/'
-        mavenSetM2Home: true
-        mavenAuthenticateFeed: true
-        skipEffectivePom: true
-        mavenPomFile: 'pom.xml'
-        mavenOptions: '$(MAVEN_OPTS)'
-        javaHomeOption: 'Path'
-        jdkDirectory: '/opt/java11'
-        publishJUnitResults: true
-        testResultsFiles: "**/surefire-reports/TEST-*.xml"
-        goals: "deploy"
-        options: "-s deploy-settings.xml -DDEPLOY_TOKEN=$(DEPLOY_TOKEN) -Dgpg.skip=false -Dgpg.passphrase=$(CCCS_GPG_KEY)"
+          - task: Maven@4
+            displayName: "Build project with maven"
+            env:
+              # The cccs_gpg_key and deploy_token secrets are set in the settings UI for this pipeline.
+              CCCS_GPG_KEY: $(cccs_gpg_key)
+              DEPLOY_TOKEN: $(deploy_token)
+            inputs:
+              mavenVersionOption: "Path"
+              mavenDirectory: "/opt/maven3/"
+              mavenSetM2Home: true
+              mavenAuthenticateFeed: true
+              skipEffectivePom: true
+              mavenPomFile: "pom.xml"
+              mavenOptions: "$(MAVEN_OPTS)"
+              javaHomeOption: "Path"
+              jdkDirectory: "/opt/java11"
+              publishJUnitResults: true
+              testResultsFiles: "**/surefire-reports/TEST-*.xml"
+              goals: "$(mvn_goal)"
+              # We don't really need/want any of these options for non-deploy builds, but it's much easier, in terms of this YAML,  to just set them all the time.
+              options: "-s deploy-settings.xml -DDEPLOY_TOKEN=\"$(DEPLOY_TOKEN)\" -Dgpg.skip=false -Dgpg.passphrase=\"$(CCCS_GPG_KEY)\""
