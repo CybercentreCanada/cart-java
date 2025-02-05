@@ -52,11 +52,13 @@ stages:
             displayName: "Import GPG Secret Key"
             name: import
             env:
+              # The cccs_gpg_secret_key secret is set in the settings UI for this pipeline.
               CCCS_GPG_SECRET_KEY: $(cccs_gpg_secret_key)
 
           - task: Maven@4
             displayName: "Build project with maven"
             env:
+              # The cccs_gpg_key and deploy_token secrets are set in the settings UI for this pipeline.
               CCCS_GPG_KEY: $(cccs_gpg_key)
               DEPLOY_TOKEN: $(deploy_token)
             inputs:
