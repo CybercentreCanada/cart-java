@@ -72,4 +72,4 @@ stages:
                       testResultsFiles: '**/surefire-reports/TEST-*.xml'
                       goals: '$(mvn_goal)'
                       # We don't really need/want any of these options for non-deploy builds, but it's much easier, in terms of this YAML,  to just set them all the time.
-                      options: '-s deploy-settings.xml -DDEPLOY_TOKEN="$(DEPLOY_TOKEN)" -Dgpg.skip=false -Dgpg.passphrase="$(CCCS_GPG_KEY)"'
+                      options: '-s deploy-settings.xml -DDEPLOY_USERNAME="$(DEPLOY_USERNAME)" -DDEPLOY_TOKEN="$(DEPLOY_TOKEN)" -Dgpg.skip=false -Dgpg.passphrase="$(CCCS_GPG_KEY)"'
