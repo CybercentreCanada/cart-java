@@ -5,7 +5,7 @@
     <servers>
         <server>
             <id>ossrh</id>
-            <username>AnalysisDevelopment</username>
+            <username>${DEPLOY_USERNAME}</username>
             <password>${DEPLOY_TOKEN}</password>
         </server>
     </servers>
