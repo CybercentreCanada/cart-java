@@ -59,6 +59,7 @@ stages:
                   env:
                       # The cccs_gpg_key and deploy_token secrets are set in the settings UI for this pipeline.
                       CCCS_GPG_KEY: $(cccs_gpg_key)
+                      DEPLOY_USERNAME: $(deploy_username)
                       DEPLOY_TOKEN: $(deploy_token)
                   inputs:
                       mavenAuthenticateFeed: true
